@@ -6,4 +6,6 @@ The first new release supports the public vanilla core and includes a runnable v
 
 The React setup returns `{ dialogs, DialogsProvider }`. It separates each group's default controlled `wrapper` from its `dialogs` map, and lets an individual dialog override that wrapper. A registered dialog receives only the application props passed to its `push()` call. Its wrapper receives controlled `open` and `onOpenChange` values, position data, and `children`. Direct core consumers provide their own DOM rendering and animation; the core exposes registration, state, operations, and subscriptions without a built-in DOM host.
 
+The playground will trial a React-only `useReactiveDialog(scope, props)` hook as the working name for binding caller props to instances opened through that hook. Ordinary `scope.push(props)` remains an imperative snapshot. The hook must not be added to the stable API until its multiple-instance and caller-unmount behavior is validated.
+
 The 2.0 package root exports the framework-independent core, with `pushmodal/core` as an explicit alias and `pushmodal/react` for the React adapter. The 1.x import paths retain their existing meanings for applications that stay on 1.x, including its React-based `pushmodal/core` path.
