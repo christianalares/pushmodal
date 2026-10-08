@@ -61,3 +61,44 @@ test('server rendering starts with an empty host without losing registry state',
   expect(renderToString(<DialogsProvider />)).not.toContain('7');
   expect(dialogs.modals.counter.pop()?.props).toEqual({ count: 7 });
 });
+
+test('visual layers keep exiting roots in order until their exit completes', () => {
+  function RetainingWrapper({ open, layerIndex, isVisualTop, onExitComplete, children }: DialogWrapperProps) {
+    return (
+      <div data-layer={layerIndex} data-open={open} data-visual-top={isVisualTop}>
+        {children}
+        {!open && <button onClick={onExitComplete}>Finish exit</button>}
+      </div>
+    );
+  }
+
+  const { dialogs, DialogsProvider } = createDialogs({
+    modals: { wrapper: RetainingWrapper, dialogs: { counter: Counter } },
+  });
+  render(<DialogsProvider />);
+
+  act(() => { dialogs.modals.counter.push({ count: 1 }); });
+  act(() => { dialogs.modals.counter.push({ count: 2 }); });
+  act(() => { dialogs.modals.counter.pop(); });
+  act(() => { dialogs.modals.counter.push({ count: 3 }); });
+
+  const layer = (count: string) => screen.getByText(count).closest('[data-layer]');
+  expect(layer('1')).toHaveAttribute('data-layer', '0');
+  expect(layer('2')).toHaveAttribute('data-layer', '1');
+  expect(layer('2')).toHaveAttribute('data-open', 'false');
+  expect(layer('3')).toHaveAttribute('data-layer', '2');
+  expect(layer('3')).toHaveAttribute('data-visual-top', 'true');
+
+  act(() => { dialogs.modals.counter.pop(); });
+  expect(layer('1')).toHaveAttribute('data-visual-top', 'false');
+  expect(layer('3')).toHaveAttribute('data-open', 'false');
+  expect(layer('3')).toHaveAttribute('data-visual-top', 'true');
+
+  fireEvent.click(screen.getAllByText('Finish exit')[0]);
+  expect(screen.queryByText('2')).not.toBeInTheDocument();
+  expect(layer('3')).toHaveAttribute('data-layer', '1');
+  expect(layer('1')).toHaveAttribute('data-visual-top', 'false');
+
+  fireEvent.click(screen.getByText('Finish exit'));
+  expect(layer('1')).toHaveAttribute('data-visual-top', 'true');
+});

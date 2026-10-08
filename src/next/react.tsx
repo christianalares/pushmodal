@@ -16,6 +16,10 @@ export type DialogWrapperProps = {
   open: boolean;
   onOpenChange(open: boolean): void;
   position: DialogPosition;
+  /** Visual order among mounted roots, including dialogs still exiting. */
+  layerIndex: number;
+  /** Whether this is the highest mounted root, including dialogs still exiting. */
+  isVisualTop: boolean;
   children: React.ReactNode;
   /** Optional escape hatch for wrappers that keep closed content mounted. */
   onExitComplete?(): void;
@@ -117,7 +121,7 @@ export function createDialogs<const Config extends Registration>(config: ValidRe
 
     return (
       <>
-        {visible.map(({ item, position }) => {
+        {visible.map(({ item, position }, layerIndex) => {
           const definition = groups[item.group].dialogs[item.name];
           const Component = typeof definition === 'function' ? definition : definition.component;
           const Wrapper =
@@ -132,6 +136,8 @@ export function createDialogs<const Config extends Registration>(config: ValidRe
                 if (!isOpen) item.instance.pop();
               }}
               position={position}
+              layerIndex={layerIndex}
+              isVisualTop={layerIndex === visible.length - 1}
               onExitComplete={() => finishExit(item.id)}
             >
               <ExitMarker onUnmount={() => finishExit(item.id)}>

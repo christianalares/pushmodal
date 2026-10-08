@@ -19,7 +19,7 @@ export const { dialogs, DialogsProvider } = createDialogs({
 })
 ```
 
-Mount `<DialogsProvider />` once for that registry. A wrapper receives `open`, `onOpenChange`, `position`, `children`, and an optional `onExitComplete` callback. It can use any controlled dialog component or plain React. Content components receive their typed `push` props.
+Mount `<DialogsProvider />` once for that registry. A wrapper receives `open`, `onOpenChange`, `position`, `layerIndex`, `isVisualTop`, `children`, and an optional `onExitComplete` callback. It can use any controlled dialog component or plain React. Content components receive their typed `push` props.
 
 ```tsx
 import { dialogs } from './ui/dialogs'
@@ -71,7 +71,7 @@ dialogs.sheets.editAddress.push({ addressId: '123' })
 unsubscribe()
 ```
 
-The core stores logical open instances, calculates each open instance's global and group position, and provides subscriptions. Adapters decide how to render them. Popping removes an instance from core state immediately. The React host retains the closed root with its last position while its wrapper or UI library animates out, then removes it when content unmounts. Wrappers that keep closed content mounted should call `onExitComplete` after their exit finishes.
+The core stores logical open instances, calculates each open instance's global and group position, and provides subscriptions. Adapters decide how to render them. Popping removes an instance from core state immediately. The React host retains the closed root with its last position while its wrapper or UI library animates out, then removes it when content unmounts. `layerIndex` is the mounted root's visual order, including roots still exiting; use it for backdrop and content stacking. `isVisualTop` identifies the highest mounted root. `position` describes only the logical open stack. Wrappers using independently mounted modal primitives should use `isVisualTop` to prevent a background root from dismissing itself while another dialog is on top or animating out. Wrappers that keep closed content mounted should call `onExitComplete` after their exit finishes.
 
 ## Migration from 1.x
 

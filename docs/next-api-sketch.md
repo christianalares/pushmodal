@@ -24,7 +24,7 @@ export const { dialogs, DialogsProvider } = createDialogs({
 })
 ```
 
-The app mounts one `DialogsProvider` for this registry. Each `createDialogs` call makes an isolated registry and provider. The group wrapper receives controlled open state, a change callback, position data, and children. The registered component receives only the props supplied to `push()`.
+The app mounts one `DialogsProvider` for this registry. Each `createDialogs` call makes an isolated registry and provider. The group wrapper receives controlled open state, a change callback, logical position data, a visual `layerIndex` and `isVisualTop`, and children. The registered component receives only the props supplied to `push()`.
 
 ## Operations
 
@@ -82,6 +82,6 @@ The redesign is a major 2.0 release. Version 1.x remains installable, and a migr
 - Duplicate instances, scoped pop operations, instance identity, and position data while one instance exits.
 - Vanilla core subscriptions, React server rendering and hydration, and the exact core registration syntax.
 
-The separate local `pushmodal-playground` repository now exercises Base UI dialogs and alerts, Radix sheets, and a plain React timer wrapper. Browser checks confirmed that a sheet-scoped `popAll()` leaves an alert open, two instances of the same sheet can stack, a reactive timer follows its caller's state, and both Base UI and Radix retain their closed content for the tested exit animations before unmounting. Core and React tests cover scoped selection, exact instance handles, subscriptions, server rendering, and caller unmount behavior.
+The separate local `pushmodal-playground` repository now exercises Base UI dialogs and alerts, Radix sheets, and a plain React timer wrapper. Browser checks at desktop and phone widths confirmed that a sheet-scoped `popAll()` leaves an alert open, two instances of the same sheet can stack, a reactive timer follows its caller's state, and both Base UI and Radix retain their closed content for the tested exit animations before unmounting. A pushed replacement gets a new component instance while the old one exits. `layerIndex` keeps an exiting root below newer dialogs even after logical positions change. `isVisualTop` stays false for underlying roots until an exiting root unmounts, preventing alert dismissal from closing a sheet underneath. The Radix wrapper guards background dismissal, and its backdrop animates out with the sheet. Core and React tests cover scoped selection, exact instance handles, subscriptions, server rendering, caller unmount behavior, and visual layer order through exit.
 
 Still to validate before a 2.0 release: hydration in a real server-rendered app, wrappers with several animated parts that finish at different times, and cleanup when a wrapper keeps closed content mounted. The existing 1.x source and examples also need removal or migration before this branch is ready for a public pull request.
