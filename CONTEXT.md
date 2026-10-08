@@ -7,6 +7,9 @@ Pushmodal manages dialog-like UI that an application opens on demand.
 **Dialog group**:
 An application-defined namespace of related dialog-like UI, such as sheets or alerts. Groups do not prescribe a particular UI library.
 
+**Dialog scope**:
+An ordered view of open dialog instances: all instances, the instances in one group, or the instances of one registered dialog.
+
 **Dialog instance**:
 One opening of a registered dialog-like item. Multiple instances of the same item may coexist, and instances from every group share an order.
 
