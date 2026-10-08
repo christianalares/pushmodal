@@ -64,12 +64,14 @@ const { dialogs, subscribe, getSnapshot } = createDialogs({
   sheets: { dialogs: { editAddress: defineDialog<{ addressId: string }>() } },
 })
 
-const unsubscribe = subscribe(() => console.log(getSnapshot()))
+const unsubscribe = subscribe(() => {
+  for (const item of getSnapshot()) console.log(item.position)
+})
 dialogs.sheets.editAddress.push({ addressId: '123' })
 unsubscribe()
 ```
 
-The core stores logical open instances and provides subscriptions. Adapters decide how to render them. Popping removes an instance from core state immediately. The React host retains the closed root while its wrapper or UI library animates out, then removes it when content unmounts. Wrappers that keep closed content mounted should call `onExitComplete` after their exit finishes.
+The core stores logical open instances, calculates each open instance's global and group position, and provides subscriptions. Adapters decide how to render them. Popping removes an instance from core state immediately. The React host retains the closed root with its last position while its wrapper or UI library animates out, then removes it when content unmounts. Wrappers that keep closed content mounted should call `onExitComplete` after their exit finishes.
 
 ## Migration from 1.x
 

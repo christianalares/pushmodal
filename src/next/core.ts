@@ -34,12 +34,22 @@ export type Dialogs<Groups extends Record<string, Record<string, any>>> = {
   };
 };
 
+export type DialogPosition = Readonly<{
+  globalIndex: number;
+  globalCount: number;
+  groupIndex: number;
+  groupCount: number;
+  isGlobalTop: boolean;
+  isGroupTop: boolean;
+}>;
+
 export type DialogSnapshot<Props = unknown> = Readonly<{
   id: number;
   group: string;
   name: string;
   props: Props;
   instance: DialogInstance<Props>;
+  position: DialogPosition;
 }>;
 
 export type DialogRegistry<Groups extends Record<string, Record<string, any>>> = {
@@ -97,13 +107,31 @@ export function createDialogRegistry<
   const listeners = new Set<() => void>();
 
   const notify = () => {
-    snapshot = records.map(({ id, group, name, props, instance }) => ({
-      id,
-      group,
-      name,
-      props,
-      instance,
-    }));
+    const groupTotals = new Map<string, number>();
+    const groupSeen = new Map<string, number>();
+    for (const item of records) {
+      groupTotals.set(item.group, (groupTotals.get(item.group) ?? 0) + 1);
+    }
+    snapshot = records.map(({ id, group, name, props, instance }, globalIndex) => {
+      const groupIndex = groupSeen.get(group) ?? 0;
+      const groupCount = groupTotals.get(group) ?? 0;
+      groupSeen.set(group, groupIndex + 1);
+      return {
+        id,
+        group,
+        name,
+        props,
+        instance,
+        position: {
+          globalIndex,
+          globalCount: records.length,
+          groupIndex,
+          groupCount,
+          isGlobalTop: globalIndex === records.length - 1,
+          isGroupTop: groupIndex === groupCount - 1,
+        },
+      };
+    });
     for (const listener of Array.from(listeners)) listener();
   };
 

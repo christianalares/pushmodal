@@ -4,19 +4,13 @@ import {
   type DialogInstance,
   type DialogRegistry,
   type DialogSnapshot,
+  type DialogPosition,
   type Dialogs,
   type NamedDialog,
   type ValidRegistration,
 } from './core';
 
-export type DialogPosition = Readonly<{
-  globalIndex: number;
-  globalCount: number;
-  groupIndex: number;
-  groupCount: number;
-  isGlobalTop: boolean;
-  isGroupTop: boolean;
-}>;
+export type { DialogPosition } from './core';
 
 export type DialogWrapperProps = {
   open: boolean;
@@ -50,28 +44,6 @@ type PropsMap<Config extends Registration> = {
 type Positioned = { item: DialogSnapshot; position: DialogPosition };
 const emptySnapshot: readonly DialogSnapshot[] = [];
 const bindings = new WeakMap<object, DialogRegistry<any>>();
-
-function positions(items: readonly DialogSnapshot[]): Positioned[] {
-  const totals = new Map<string, number>();
-  const seen = new Map<string, number>();
-  for (const item of items) totals.set(item.group, (totals.get(item.group) ?? 0) + 1);
-  return items.map((item, globalIndex) => {
-    const groupIndex = seen.get(item.group) ?? 0;
-    seen.set(item.group, groupIndex + 1);
-    const groupCount = totals.get(item.group) ?? 0;
-    return {
-      item,
-      position: {
-        globalIndex,
-        globalCount: items.length,
-        groupIndex,
-        groupCount,
-        isGlobalTop: globalIndex === items.length - 1,
-        isGroupTop: groupIndex === groupCount - 1,
-      },
-    };
-  });
-}
 
 function ExitMarker({
   children,
@@ -116,7 +88,7 @@ export function createDialogs<const Config extends Registration>(config: ValidRe
     const [exiting, setExiting] = React.useState<Positioned[]>([]);
     const previous = React.useRef<Positioned[]>([]);
     const finished = React.useRef(new Set<number>());
-    const current = positions(open);
+    const current = open.map((item) => ({ item, position: item.position }));
     const openIds = new Set(open.map((item) => item.id));
     const justClosed = previous.current.filter(({ item }) => !openIds.has(item.id));
     const visible = [...current, ...exiting, ...justClosed]

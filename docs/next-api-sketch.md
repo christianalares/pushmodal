@@ -68,7 +68,7 @@ function TimerButton() {
 
 ## Core and release boundary
 
-The package root and `pushmodal/core` export a framework-independent registry that accepts group and dialog names without UI components. `pushmodal/react` provides component registration and the provider. Core registration uses `createDialogs({ group: { dialogs: { name: defineDialog<Props>() } } })`.
+The package root and `pushmodal/core` export a framework-independent registry that accepts group and dialog names without UI components. Its snapshots include derived global and group position data. `pushmodal/react` consumes those positions and provides component registration and the provider. Core registration uses `createDialogs({ group: { dialogs: { name: defineDialog<Props>() } } })`.
 
 The React provider can render an empty initial stack on the server. Opening dialogs is a client-side action in the first release. Registry state persists independently of provider mounting.
 

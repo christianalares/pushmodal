@@ -44,6 +44,27 @@ test('popAll returns newest first within its scope', () => {
   expect(dialogs.popAll()).toEqual([]);
 });
 
+test('core snapshots provide positions across the global and group stacks', () => {
+  const { dialogs, getSnapshot } = setup();
+  dialogs.sheets.edit.push({ id: 'A' });
+  dialogs.alerts.confirm.push({ message: 'Save?' });
+  dialogs.sheets.edit.push({ id: 'B' });
+
+  const before = getSnapshot();
+  expect(before.map((item) => item.position)).toEqual([
+    { globalIndex: 0, globalCount: 3, groupIndex: 0, groupCount: 2, isGlobalTop: false, isGroupTop: false },
+    { globalIndex: 1, globalCount: 3, groupIndex: 0, groupCount: 1, isGlobalTop: false, isGroupTop: true },
+    { globalIndex: 2, globalCount: 3, groupIndex: 1, groupCount: 2, isGlobalTop: true, isGroupTop: true },
+  ]);
+
+  dialogs.sheets.pop();
+  expect(getSnapshot().map((item) => item.position)).toEqual([
+    { globalIndex: 0, globalCount: 2, groupIndex: 0, groupCount: 1, isGlobalTop: false, isGroupTop: true },
+    { globalIndex: 1, globalCount: 2, groupIndex: 0, groupCount: 1, isGlobalTop: true, isGroupTop: true },
+  ]);
+  expect(before[0].position.groupCount).toBe(2);
+});
+
 test('subscribers see immutable snapshots and live props can update through the registry', () => {
   const { dialogs, subscribe, getSnapshot, setInstanceProps } = setup();
   const versions: number[] = [];
