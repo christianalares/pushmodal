@@ -8,7 +8,7 @@ Pushmodal manages dialog-like UI that an application opens on demand.
 An application-defined namespace of related dialog-like UI, such as sheets or alerts. Groups do not prescribe a particular UI library.
 
 **Dialog instance**:
-One opening of a registered dialog-like item. Instances from every group share an order, regardless of how they are presented.
+One opening of a registered dialog-like item. Multiple instances of the same item may coexist, and instances from every group share an order.
 
 **Modal**:
 A property of a dialog's interaction with the rest of the page, where outside content cannot be used while the dialog is open.
