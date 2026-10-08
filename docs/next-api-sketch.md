@@ -1,6 +1,6 @@
 # Pushmodal 2.0 API sketch
 
-Status: Draft for design review. This branch contains design documentation, not the new runtime or a release.
+Status: Draft implementation under local playground review. This branch is not a release.
 
 ## React registration
 
@@ -68,7 +68,7 @@ function TimerButton() {
 
 ## Core and release boundary
 
-The package root and `pushmodal/core` export a framework-independent registry that accepts group and dialog names without UI components. `pushmodal/react` provides component registration and the provider. The exact core registration syntax remains to be tried in the playground.
+The package root and `pushmodal/core` export a framework-independent registry that accepts group and dialog names without UI components. `pushmodal/react` provides component registration and the provider. Core registration uses `createDialogs({ group: { dialogs: { name: defineDialog<Props>() } } })`.
 
 The React provider can render an empty initial stack on the server. Opening dialogs is a client-side action in the first release. Registry state persists independently of provider mounting.
 
@@ -81,3 +81,7 @@ The redesign is a major 2.0 release. Version 1.x remains installable, and a migr
 - React Strict Mode behavior for reactive binding cleanup and UI dismissal.
 - Duplicate instances, scoped pop operations, instance identity, and position data while one instance exits.
 - Vanilla core subscriptions, React server rendering and hydration, and the exact core registration syntax.
+
+The separate local `pushmodal-playground` repository now exercises Base UI dialogs and alerts, Radix sheets, and a plain React timer wrapper. Browser checks confirmed that a sheet-scoped `popAll()` leaves an alert open, two instances of the same sheet can stack, a reactive timer follows its caller's state, and both Base UI and Radix retain their closed content for the tested exit animations before unmounting. Core and React tests cover scoped selection, exact instance handles, subscriptions, server rendering, and caller unmount behavior.
+
+Still to validate before a 2.0 release: hydration in a real server-rendered app, wrappers with several animated parts that finish at different times, and cleanup when a wrapper keeps closed content mounted. The existing 1.x source and examples also need removal or migration before this branch is ready for a public pull request.

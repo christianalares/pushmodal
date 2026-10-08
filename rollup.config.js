@@ -9,11 +9,11 @@ import postcss from 'rollup-plugin-postcss';
 import autoprefixer from 'autoprefixer';
 import { dts } from 'rollup-plugin-dts';
 
-const entries = ['index', 'base-ui', 'core'];
+const entries = ['index', 'core', 'react'];
 
 export default [
   ...entries.map((entry) => ({
-    input: `./src/${entry}.ts`,
+    input: `./src/${entry}.${entry === 'react' ? 'tsx' : 'ts'}`,
     output: [
       {
         file: `dist/${entry}.cjs.js`,
@@ -22,7 +22,7 @@ export default [
         exports: 'named',
         sourcemap: true,
         inlineDynamicImports: true,
-        banner: '"use client";',
+        banner: entry === 'react' ? '"use client";' : undefined,
       },
       ...['esm.js', 'mjs'].map((extension) => ({
         file: `dist/${entry}.${extension}`,
@@ -30,7 +30,7 @@ export default [
         exports: 'named',
         sourcemap: true,
         inlineDynamicImports: true,
-        banner: '"use client";',
+        banner: entry === 'react' ? '"use client";' : undefined,
       })),
     ],
     plugins: [

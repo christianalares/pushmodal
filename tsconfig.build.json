@@ -1,4 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": ["node_modules", "dist", "src/**/*.stories.tsx", "src/**/*.test.tsx"]
+  "include": ["src/index.ts", "src/core.ts", "src/react.tsx", "src/next/**/*.ts", "src/next/**/*.tsx"],
+  "exclude": ["node_modules", "dist"]
 }

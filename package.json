@@ -1,7 +1,7 @@
 {
   "name": "pushmodal",
-  "version": "1.1.0",
-  "description": "Handle shadcn dialog, sheet and drawer with ease",
+  "version": "2.0.0-next.0",
+  "description": "Framework-independent dialog stack with a React adapter",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "files": [
@@ -25,20 +25,23 @@
     "commit": "git add . && cz",
     "semantic-release": "standard-version",
     "build-storybook": "storybook build",
-    "build-lib": "rm -rf lib && mkdir lib && rollup -c --bundleConfigAsCjs && cp -r ./dist ./lib && cp package.json LICENSE README.md ./lib",
-    "test": "jest -c jest/jest.config.js --verbose --passWithNoTests",
+    "build-lib": "pnpm build",
+    "test": "jest -c jest/jest.config.js --verbose",
     "test:watch": "pnpm run test --watch",
     "test:clear": "pnpm run test --clearCache",
-    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
-    "test:package": "node scripts/check-package.cjs"
+    "typecheck": "tsc -p tsconfig.build.json --noEmit --emitDeclarationOnly false",
+    "test:package": "node scripts/check-package.cjs",
+    "build": "rollup -c --bundleConfigAsCjs"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lindesvard/pushmodal.git"
   },
   "keywords": [
+    "dialogs",
+    "headless",
     "react",
-    "button"
+    "stack"
   ],
   "author": "Carl Lindesvärd (https://git.new/carl)",
   "license": "MIT",
@@ -124,10 +127,8 @@
     "vaul": "^0.9.0"
   },
   "peerDependencies": {
-    "@base-ui/react": "^1.0.0",
-    "@radix-ui/react-dialog": "^1.0.0",
-    "react": "^16.12.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^20.0.0 || ^21.0.0",
-    "react-dom": "^16.12.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^20.0.0 || ^21.0.0"
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
   },
   "config": {
     "commitizen": {
@@ -140,48 +141,36 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "node": "./dist/index.cjs.js",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs.js"
     },
-    "./base-ui": {
-      "types": "./dist/base-ui.d.ts",
-      "node": "./dist/base-ui.cjs.js",
-      "import": "./dist/base-ui.mjs",
-      "require": "./dist/base-ui.cjs.js"
-    },
     "./core": {
       "types": "./dist/core.d.ts",
-      "node": "./dist/core.cjs.js",
       "import": "./dist/core.mjs",
       "require": "./dist/core.cjs.js"
     },
-    "./package.json": "./package.json",
-    "./dist/*.cjs": "./dist/*.cjs.js",
-    "./dist/*.esm": "./dist/*.esm.js",
-    "./dist/*.d.ts": "./dist/*.d.ts",
-    "./dist/*.d": "./dist/*.d.ts",
-    "./dist/*": {
-      "types": "./dist/*.d.ts",
-      "default": "./dist/*"
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.mjs",
+      "require": "./dist/react.cjs.js"
     },
-    "./*": "./*"
+    "./package.json": "./package.json"
   },
   "typesVersions": {
     "*": {
-      "base-ui": [
-        "dist/base-ui.d.ts"
-      ],
       "core": [
         "dist/core.d.ts"
       ],
-      "*": [
-        "*"
+      "react": [
+        "dist/react.d.ts"
       ]
     }
   },
   "peerDependenciesMeta": {
-    "@base-ui/react": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
       "optional": true
     }
   }

@@ -1,2 +1,1 @@
-export * from './lib/factory';
-export * from './lib/responsive';
+export * from './next/core';

@@ -6,10 +6,7 @@ module.exports = {
   // setupFiles before the tests are ran
   setupFilesAfterEnv: ['<rootDir>/jest-setup.js'],
   // The glob patterns Jest uses to detect test files
-  testMatch: [
-    `<rootDir>/../src/**/__tests__/**/*.{js,jsx,ts,tsx}`,
-    `<rootDir>/../src/**/*.{spec,test}.{js,jsx,ts,tsx}`,
-  ],
+  testMatch: [`<rootDir>/../src/next/**/*.{spec,test}.{js,jsx,ts,tsx}`],
   // The test environment that will be used for testing
   testEnvironment: 'jsdom',
   // A map from regular expressions to paths to transformers
