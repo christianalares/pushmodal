@@ -203,12 +203,12 @@ function ReactiveLauncher() {
     const interval = window.setInterval(() => setSeconds((value) => value + 1), 1000)
     return () => window.clearInterval(interval)
   }, [])
-  const timer = useReactiveDialog(dialogs.modals.timer, { count: seconds })
+  const timerModal = useReactiveDialog(dialogs.modals.timer, { count: seconds })
   return <Card><CardHeader><CardTitle>Reactive local props</CardTitle>
     <CardDescription>The count ticks each second. Compare a subscribed timer with a snapshot.</CardDescription></CardHeader>
     <CardContent className="flex flex-wrap gap-2">
       <BaseButton variant="outline" onClick={() => setSeconds((value) => value + 1)}>Tick: {seconds}</BaseButton>
-      <BaseButton onClick={() => timer.push()}>Open reactive timer</BaseButton>
+      <BaseButton onClick={() => timerModal.push()}>Open reactive timer</BaseButton>
       <BaseButton variant="secondary" onClick={() => dialogs.modals.timer.push({ count: seconds })}>Open snapshot timer</BaseButton>
     </CardContent></Card>
 }
@@ -261,7 +261,7 @@ function App() {
       <Card><CardHeader><CardTitle>Open by name</CardTitle><CardDescription>Typed scopes replace string names and let you close globally, by group, or by instance.</CardDescription></CardHeader>
         <CardContent><Snippet>{"const instance = dialogs.modals.settings.push(props)\n\ndialogs.modals.pop()\ninstance.pop()"}</Snippet></CardContent></Card>
       <Card><CardHeader><CardTitle>Follow React state</CardTitle><CardDescription>Use the hook when an open dialog needs fresh props. Ordinary push keeps a snapshot.</CardDescription></CardHeader>
-        <CardContent><Snippet>{"const timer = useReactiveDialog(\n  dialogs.modals.timer, { count }\n)\ntimer.push()"}</Snippet></CardContent></Card>
+        <CardContent><Snippet>{"const timerModal = useReactiveDialog(dialogs.modals.timer, { count })\ntimerModal.push()"}</Snippet></CardContent></Card>
     </section>
     <DialogsProvider />
   </main>

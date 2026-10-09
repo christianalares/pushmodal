@@ -53,12 +53,12 @@ import { dialogs } from './ui/dialogs'
 
 function TimerButton() {
   const [seconds, setSeconds] = useState(0)
-  const timer = useReactiveDialog(dialogs.modals.timer, { count: seconds })
+  const timerModal = useReactiveDialog(dialogs.modals.timer, { count: seconds })
 
   return (
     <>
       <button onClick={() => setSeconds((value) => value + 1)}>Tick</button>
-      <button onClick={() => timer.push()}>Open timer</button>
+      <button onClick={() => timerModal.push()}>Open timer</button>
     </>
   )
 }
