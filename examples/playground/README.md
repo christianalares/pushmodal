@@ -77,11 +77,13 @@ function TimerLauncher() {
   const [count, setCount] = React.useState(0)
   const timerModal = useReactiveDialog(dialogs.modals.timer, { count })
 
-  return <>
-    <button onClick={() => setCount((value) => value + 1)}>Increment</button>
-    <button onClick={() => timerModal.push()}>Open reactive timer</button>
-    <button onClick={() => dialogs.modals.timer.push({ count })}>Open snapshot timer</button>
-  </>
+  return (
+    <>
+      <button onClick={() => setCount((value) => value + 1)}>Increment</button>
+      <button onClick={() => timerModal.push()}>Open reactive timer</button>
+      <button onClick={() => dialogs.modals.timer.push({ count })}>Open snapshot timer</button>
+    </>
+  )
 }
 ```
 
