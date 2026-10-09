@@ -24,6 +24,8 @@ pnpm playground:dev
 
 Open the local URL printed by Vite. The playground lives in [examples/playground](examples/playground/README.md) and uses this workspace package directly. It compares Base UI, Radix, and a plain React wrapper, and includes both snapshot and reactive props. Its README has a short tour and points to the relevant source. The [earlier selection prototype](examples/dialog-selection-prototype.html) is a standalone HTML experiment about scoped and instance-specific closing; it does not run the package.
 
+For a compact file-by-file setup, see the [two-dialog example](examples/playground/src/examples/basic/dialogs.tsx) and its [provider usage](examples/playground/src/examples/basic/app.tsx).
+
 ## React setup
 
 ```tsx

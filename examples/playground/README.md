@@ -25,6 +25,20 @@ Open the local URL printed by Vite. The root script builds Pushmodal first, then
 
 The runnable registration and examples are in [`src/main.tsx`](src/main.tsx). It contains the group wrappers, dialog components, the `createDialogs` call, and the `useReactiveDialog` launcher. Generated shadcn components are in `src/components/ui/base` and `src/components/ui/radix`; the wrapper code shows the Pushmodal integration points.
 
+### Complete two-dialog setup
+
+The playground also displays a smaller, copyable example directly from these source files:
+
+1. [`settings-modal.tsx`](src/examples/basic/settings-modal.tsx) defines the settings content and its `section` prop.
+2. [`edit-adress-sheet.tsx`](src/examples/basic/edit-adress-sheet.tsx) defines the address sheet and its `addressId` prop.
+3. [`wrappers.tsx`](src/examples/basic/wrappers.tsx) connects controlled Base UI dialog and sheet components to Pushmodal's `open`, `onOpenChange`, `layerIndex`, and `isVisualTop` props.
+4. [`dialogs.tsx`](src/examples/basic/dialogs.tsx) registers both components with `createDialogs` and exports `dialogs` and `DialogsProvider`.
+5. [`app.tsx`](src/examples/basic/app.tsx) calls the typed `push()` methods and mounts `<DialogsProvider />` once beside the app content.
+
+These files are typechecked with the playground. Their UI imports point to the local shadcn Base UI components, so replace those imports with your app's own UI components when adapting the example. The provider renders the registry's dialogs and does not need to wrap the rest of the app.
+
+Choose **Run this smaller example** in the playground to try these exact files as a separate page. It uses its own registry, so it does not mix stacks with the larger Base UI and Radix comparison.
+
 The registration has one default wrapper per group. A dialog can provide its own wrapper when it uses a different UI primitive:
 
 ```tsx

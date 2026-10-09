@@ -12,8 +12,22 @@ import { Button as RadixButton } from '@/components/ui/radix/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { BasicApp } from './examples/basic/app'
+import settingsModalSource from './examples/basic/settings-modal.tsx?raw'
+import editAddressSheetSource from './examples/basic/edit-adress-sheet.tsx?raw'
+import wrappersSource from './examples/basic/wrappers.tsx?raw'
+import dialogsSource from './examples/basic/dialogs.tsx?raw'
+import appSource from './examples/basic/app.tsx?raw'
 import './index.css'
 import './style.css'
+
+const basicExampleFiles = [
+  { name: 'settings-modal.tsx', description: 'The modal content and its typed props.', source: settingsModalSource },
+  { name: 'edit-adress-sheet.tsx', description: 'The sheet content and its typed props.', source: editAddressSheetSource },
+  { name: 'wrappers.tsx', description: 'Controlled Base UI wrappers with visual layer order.', source: wrappersSource },
+  { name: 'dialogs.tsx', description: 'Register both dialogs and export the provider.', source: dialogsSource },
+  { name: 'app.tsx', description: 'Open the dialogs and mount the provider once.', source: appSource },
+]
 
 function Position({ position }: Pick<DialogWrapperProps, 'position'>) {
   return <small className="text-xs text-muted-foreground">Stack {position.globalIndex + 1}/{position.globalCount} · group {position.groupIndex + 1}/{position.groupCount}</small>
@@ -263,8 +277,17 @@ function App() {
       <Card><CardHeader><CardTitle>Follow React state</CardTitle><CardDescription>Use the hook when an open dialog needs fresh props. Ordinary push keeps a snapshot.</CardDescription></CardHeader>
         <CardContent><Snippet>{"const timerModal = useReactiveDialog(dialogs.modals.timer, { count })\ntimerModal.push()"}</Snippet></CardContent></Card>
     </section>
+    <h2 className="font-heading text-xl font-semibold">Complete setup example</h2>
+    <p className="text-sm text-muted-foreground">These files compile with this playground. They show two dialog components, their wrappers, one registry, and the provider in an app. <a className="underline underline-offset-4" href="?example=basic">Run this smaller example</a>.</p>
+    <section aria-label="Complete setup example" className="grid gap-4">
+      {basicExampleFiles.map((file) => <Card key={file.name}>
+        <CardHeader><CardTitle className="font-mono text-base">{file.name}</CardTitle><CardDescription>{file.description}</CardDescription></CardHeader>
+        <CardContent><Snippet>{file.source.trim()}</Snippet></CardContent>
+      </Card>)}
+    </section>
     <DialogsProvider />
   </main>
 }
 
-createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>)
+const example = new URLSearchParams(window.location.search).get('example')
+createRoot(document.getElementById('root')!).render(<React.StrictMode>{example === 'basic' ? <BasicApp /> : <App />}</React.StrictMode>)
