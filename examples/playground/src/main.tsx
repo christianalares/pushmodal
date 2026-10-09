@@ -214,7 +214,7 @@ function ReactiveLauncher() {
 }
 
 function Snippet({ children }: { children: string }) {
-  return <pre className="overflow-x-auto rounded-lg bg-zinc-950 p-3 text-xs leading-5 text-zinc-100"><code>{children}</code></pre>
+  return <pre className="overflow-x-auto rounded-lg bg-zinc-950 p-4 text-sm leading-6 text-zinc-100"><code>{children}</code></pre>
 }
 
 function App() {
@@ -255,7 +255,7 @@ function App() {
     <BaseButton variant="ghost" onClick={() => setShowLauncher((value) => !value)}>{showLauncher ? 'Unmount' : 'Remount'} timer launcher</BaseButton>
     <p className="text-sm text-muted-foreground">Try opening an alert from a sheet, then call sheets.popAll(). The alert should remain.</p>
     <h2 className="font-heading text-xl font-semibold">How the API works</h2>
-    <section aria-label="What changed" className="grid gap-4 md:grid-cols-3">
+    <section aria-label="What changed" className="grid gap-4">
       <Card><CardHeader><CardTitle>Register once</CardTitle><CardDescription>Group dialogs and choose the wrapper that renders each group.</CardDescription></CardHeader>
         <CardContent><Snippet>{"const { dialogs, DialogsProvider } =\n  createDialogs({\n    modals: { wrapper, dialogs: { settings } }\n  })"}</Snippet></CardContent></Card>
       <Card><CardHeader><CardTitle>Open by name</CardTitle><CardDescription>Typed scopes replace string names and let you close globally, by group, or by instance.</CardDescription></CardHeader>
