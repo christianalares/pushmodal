@@ -31,7 +31,9 @@
     "test:clear": "pnpm run test --clearCache",
     "typecheck": "tsc -p tsconfig.build.json --noEmit --emitDeclarationOnly false",
     "test:package": "node scripts/check-package.cjs",
-    "build": "rollup -c --bundleConfigAsCjs"
+    "build": "rollup -c --bundleConfigAsCjs",
+    "playground:dev": "pnpm build && pnpm --filter pushmodal-playground dev",
+    "playground:build": "pnpm build && pnpm --filter pushmodal-playground build"
   },
   "repository": {
     "type": "git",

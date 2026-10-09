@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dialog selection prototype</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; color: #172033; background: #f5f7fb; }
+    body { max-width: 900px; margin: 0 auto; padding: 32px 20px; }
+    h1 { margin-bottom: 8px; }
+    p { line-height: 1.5; }
+    .note { color: #526078; }
+    .panel { background: white; border: 1px solid #dce3ee; border-radius: 12px; padding: 20px; margin: 20px 0; }
+    .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    button { border: 1px solid #b7c8e1; background: #edf4ff; border-radius: 8px; padding: 8px 12px; cursor: pointer; font: inherit; }
+    button:hover { background: #dbe9ff; }
+    button:disabled { opacity: .5; cursor: default; }
+    .active { background: #1859b5; border-color: #1859b5; color: white; }
+    ol { list-style: none; padding: 0; margin: 12px 0; }
+    li { display: flex; gap: 12px; align-items: center; border-top: 1px solid #e5eaf2; padding: 10px 0; }
+    li:last-child { border-bottom: 1px solid #e5eaf2; }
+    .position { min-width: 32px; color: #68778f; }
+    .name { font-weight: 600; }
+    .group { color: #526078; }
+    #notice { min-height: 24px; color: #1859b5; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Which dialogs should close?</h1>
+  <p>This throwaway prototype tests a registry with five open dialog instances. Does closing by stack position, registered name, or exact instance match what a caller means by “close two out of five”?</p>
+  <p class="note">The model focuses on selection. It leaves animations, focus, and rendering out of scope.</p>
+
+  <section class="panel">
+    <h2>Guided cases</h2>
+    <div class="buttons" id="scenarios"></div>
+    <p id="scenario-description"></p>
+    <div class="buttons" id="steps"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Current stack</h2>
+    <p class="note">Bottom is position 1. The last row is the top. Check rows to identify exact instances.</p>
+    <ol id="stack"></ol>
+    <p id="notice" aria-live="polite"></p>
+  </section>
+
+  <section class="panel">
+    <h2>Try any action</h2>
+    <div class="buttons" id="actions"></div>
+    <p class="note">“Pop sheet” and “Pop editAddress” close the latest match, even if another dialog is above it. “Close selected” uses stable instance IDs. Positions are recalculated after every change.</p>
+  </section>
+
+  <script>
+    // Portable state model. No DOM references appear in these functions.
+    function initialStack() {
+      return {
+        nextId: 6,
+        items: [
+          { id: 1, group: 'sheets', name: 'editAddress', label: 'Address A' },
+          { id: 2, group: 'modals', name: 'editUser', label: 'User A' },
+          { id: 3, group: 'sheets', name: 'editAddress', label: 'Address B' },
+          { id: 4, group: 'alerts', name: 'confirmDelete', label: 'Delete A' },
+          { id: 5, group: 'sheets', name: 'editAddress', label: 'Address C' },
+        ],
+      };
+    }
+
+    function transition(state, action) {
+      if (action.type === 'push') {
+        const item = { id: state.nextId, group: action.group, name: action.name, label: action.label };
+        return { nextId: state.nextId + 1, items: [...state.items, item] };
+      }
+
+      if (action.type === 'pop') {
+        const index = state.items.findLastIndex((item) =>
+          (!action.group || item.group === action.group) &&
+          (!action.name || item.name === action.name)
+        );
+        return index < 0 ? state : { ...state, items: state.items.filter((_, i) => i !== index) };
+      }
+
+      if (action.type === 'closeIds') {
+        const ids = new Set(action.ids);
+        return { ...state, items: state.items.filter((item) => !ids.has(item.id)) };
+      }
+
+      if (action.type === 'closePositions') {
+        const positions = new Set(action.positions);
+        return { ...state, items: state.items.filter((_, i) => !positions.has(i + 1)) };
+      }
+
+      if (action.type === 'reset') return initialStack();
+      return state;
+    }
+
+    const scenarios = [
+      {
+        title: 'Two of five',
+        description: 'Choose two exact rows, then close them. Compare that with closing positions 1 and 2, which always refers to the current order.',
+        steps: [
+          ['Select Address A and Address B', () => { selected = new Set([1, 3]); render(); }],
+          ['Close selected instances', () => act({ type: 'closeIds', ids: [...selected] }, 'Closed the two selected instance IDs.')],
+        ],
+      },
+      {
+        title: 'Duplicate names',
+        description: 'Three editAddress sheets are open. A named pop only closes the latest one. Selection can close an older instance.',
+        steps: [
+          ['Pop latest editAddress', () => act({ type: 'pop', group: 'sheets', name: 'editAddress' }, 'Closed the latest editAddress instance.')],
+          ['Select Address A', () => { selected = new Set([1]); render(); }],
+          ['Close selected instance', () => act({ type: 'closeIds', ids: [...selected] }, 'Closed Address A by instance ID.')],
+        ],
+      },
+      {
+        title: 'Groups interleaved',
+        description: 'An alert sits between sheets. A group pop finds the latest sheet. A global pop closes whichever instance is now on top.',
+        steps: [
+          ['Pop latest sheet', () => act({ type: 'pop', group: 'sheets' }, 'Closed the latest sheet.')],
+          ['Pop globally', () => act({ type: 'pop' }, 'Closed the top instance across all groups.')],
+        ],
+      },
+    ];
+
+    let state = initialStack();
+    let selected = new Set();
+    let activeScenario = 0;
+    let stepIndex = 0;
+    let notice = '';
+
+    function act(action, message) {
+      state = transition(state, action);
+      selected = new Set([...selected].filter((id) => state.items.some((item) => item.id === id)));
+      notice = message;
+      render();
+    }
+
+    function button(label, handler, active = false) {
+      const element = document.createElement('button');
+      element.textContent = label;
+      element.className = active ? 'active' : '';
+      element.addEventListener('click', handler);
+      return element;
+    }
+
+    function render() {
+      const list = document.querySelector('#stack');
+      list.replaceChildren();
+      state.items.forEach((item, index) => {
+        const row = document.createElement('li');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = selected.has(item.id);
+        checkbox.setAttribute('aria-label', `Select ${item.label}`);
+        checkbox.addEventListener('change', () => {
+          if (checkbox.checked) selected.add(item.id);
+          else selected.delete(item.id);
+        });
+        const position = document.createElement('span');
+        position.className = 'position';
+        position.textContent = `${index + 1}.`;
+        const name = document.createElement('span');
+        name.className = 'name';
+        name.textContent = `${item.label} (#${item.id})`;
+        const group = document.createElement('span');
+        group.className = 'group';
+        group.textContent = `${item.group}.${item.name}`;
+        row.append(checkbox, position, name, group);
+        list.append(row);
+      });
+      if (!state.items.length) list.textContent = 'No dialogs are open.';
+      document.querySelector('#notice').textContent = notice;
+
+      const tabs = document.querySelector('#scenarios');
+      tabs.replaceChildren();
+      scenarios.forEach((scenario, index) => tabs.append(button(scenario.title, () => {
+        activeScenario = index;
+        stepIndex = 0;
+        state = initialStack();
+        selected = new Set();
+        notice = 'Reset to five open instances.';
+        render();
+      }, activeScenario === index)));
+
+      const scenario = scenarios[activeScenario];
+      document.querySelector('#scenario-description').textContent = scenario.description;
+      const steps = document.querySelector('#steps');
+      steps.replaceChildren();
+      if (stepIndex < scenario.steps.length) {
+        const [label, handler] = scenario.steps[stepIndex];
+        steps.append(button(`Step ${stepIndex + 1}: ${label}`, () => { handler(); stepIndex += 1; render(); }));
+      } else {
+        steps.textContent = 'Walkthrough complete. Choose a case to reset it.';
+      }
+    }
+
+    const actions = document.querySelector('#actions');
+    actions.append(
+      button('Push editAddress', () => act({ type: 'push', group: 'sheets', name: 'editAddress', label: 'New address' }, 'Pushed a new editAddress instance.')),
+      button('Pop top', () => act({ type: 'pop' }, 'Closed the current top instance.')),
+      button('Pop latest sheet', () => act({ type: 'pop', group: 'sheets' }, 'Closed the latest sheet.')),
+      button('Pop latest editAddress', () => act({ type: 'pop', group: 'sheets', name: 'editAddress' }, 'Closed the latest editAddress instance.')),
+      button('Close selected instances', () => act({ type: 'closeIds', ids: [...selected] }, 'Closed the selected instance IDs.')),
+      button('Close current positions 1 and 2', () => act({ type: 'closePositions', positions: [1, 2] }, 'Closed whichever instances held positions 1 and 2 now.')),
+      button('Reset', () => { state = initialStack(); selected = new Set(); notice = 'Reset to five open instances.'; render(); }),
+    );
+    render();
+  </script>
+</body>
+</html>

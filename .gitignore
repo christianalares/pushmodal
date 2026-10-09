@@ -3,6 +3,8 @@
 /dist
 /lib
 /coverage
+**/node_modules/
+**/dist/
 .nyc_output
 
 #docs

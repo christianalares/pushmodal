@@ -1,0 +1,19 @@
+.base-sheet-mount { animation: base-sheet-in 200ms ease-out both; }
+.base-sheet-mount[data-ending-style] { animation: base-sheet-out 200ms ease-in forwards; }
+.base-sheet-overlay { animation: base-overlay-in 150ms ease-out both; }
+.base-sheet-overlay[data-ending-style] { animation: base-overlay-out 150ms ease-in forwards; }
+
+@keyframes base-sheet-in {
+  from { opacity: 0; transform: translateX(2.5rem); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes base-sheet-out {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(2.5rem); }
+}
+@keyframes base-overlay-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes base-overlay-out { from { opacity: 1; } to { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .base-sheet-mount, .base-sheet-overlay { animation-duration: 1ms; }
+}

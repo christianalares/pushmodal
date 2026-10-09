@@ -4,6 +4,26 @@ Pushmodal manages named dialog instances in a shared stack. The core does not de
 
 This branch is a prerelease prototype. It is not published to npm.
 
+## What is new
+
+- Register named dialogs once with `createDialogs`, grouped by the scopes your app uses. Mount its `DialogsProvider` once. Each group has a wrapper for its UI library, and individual dialogs may override it.
+- Open a dialog through its typed scope, such as `dialogs.modals.settings.push({ label: 'General' })`, instead of calling `pushModal('settings', props)`. Use `dialogs.pop()`, `dialogs.sheets.pop()`, or `dialogs.sheets.editAddress.pop()` to choose how much of the stack an operation can affect. The handle returned by `push()` can close that exact instance.
+- Keep ordinary `push()` calls as snapshots. Use `useReactiveDialog` only when an already open dialog should follow props from a React component as that component renders.
+- Use the framework-independent `pushmodal/core` registry when you need the stack without React. The React adapter is exported from `pushmodal/react`.
+
+This is a proposed 2.0 API for review, not a published migration path. See the [API sketch](docs/next-api-sketch.md) for the current design and remaining validation work.
+
+## Run the playground
+
+From this branch's repository root, with Node.js 20.19+ or 22.12+ and pnpm installed:
+
+```sh
+pnpm install
+pnpm playground:dev
+```
+
+Open the local URL printed by Vite. The playground lives in [examples/playground](examples/playground/README.md) and uses this workspace package directly. It compares Base UI, Radix, and a plain React wrapper, and includes both snapshot and reactive props. Its README has a short tour and points to the relevant source. The [earlier selection prototype](examples/dialog-selection-prototype.html) is a standalone HTML experiment about scoped and instance-specific closing; it does not run the package.
+
 ## React setup
 
 ```tsx
