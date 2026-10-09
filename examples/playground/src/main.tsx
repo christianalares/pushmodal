@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
+import { Highlight, themes } from 'prism-react-renderer'
 import { createDialogs, useReactiveDialog, type DialogWrapperProps } from 'pushmodal/react'
 import * as BD from '@/components/ui/base/dialog'
 import * as BS from '@/components/ui/base/sheet'
@@ -228,7 +229,19 @@ function ReactiveLauncher() {
 }
 
 function Snippet({ children }: { children: string }) {
-  return <pre className="overflow-x-auto rounded-lg bg-zinc-950 p-4 text-sm leading-6 text-zinc-100"><code>{children}</code></pre>
+  return <Highlight code={children} language="tsx" theme={themes.vsDark}>
+    {({ className, style, tokens, getLineProps, getTokenProps }) =>
+      <pre className={`${className} overflow-x-auto rounded-lg p-4 font-mono text-sm leading-6`} style={{ ...style, backgroundColor: '#09090b' }} tabIndex={0}>
+        <code>
+          {tokens.map((line, lineIndex) =>
+            <span key={lineIndex} {...getLineProps({ line })} className="block">
+              {line.map((token, tokenIndex) => <span key={tokenIndex} {...getTokenProps({ token })} />)}
+            </span>
+          )}
+        </code>
+      </pre>
+    }
+  </Highlight>
 }
 
 function App() {
