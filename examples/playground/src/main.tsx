@@ -259,7 +259,7 @@ function App() {
       <Card><CardHeader><CardTitle>Register once</CardTitle><CardDescription>Group dialogs and choose the wrapper that renders each group.</CardDescription></CardHeader>
         <CardContent><Snippet>{"const { dialogs, DialogsProvider } =\n  createDialogs({\n    modals: { wrapper, dialogs: { settings } }\n  })"}</Snippet></CardContent></Card>
       <Card><CardHeader><CardTitle>Open by name</CardTitle><CardDescription>Typed scopes replace string names and let you close globally, by group, or by instance.</CardDescription></CardHeader>
-        <CardContent><Snippet>{"const instance =\n  dialogs.modals.settings.push(props)\n\ndialogs.modals.pop()\ninstance.pop()"}</Snippet></CardContent></Card>
+        <CardContent><Snippet>{"const instance = dialogs.modals.settings.push(props)\n\ndialogs.modals.pop()\ninstance.pop()"}</Snippet></CardContent></Card>
       <Card><CardHeader><CardTitle>Follow React state</CardTitle><CardDescription>Use the hook when an open dialog needs fresh props. Ordinary push keeps a snapshot.</CardDescription></CardHeader>
         <CardContent><Snippet>{"const timer = useReactiveDialog(\n  dialogs.modals.timer, { count }\n)\ntimer.push()"}</Snippet></CardContent></Card>
     </section>
